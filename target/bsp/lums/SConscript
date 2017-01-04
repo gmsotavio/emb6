@@ -62,6 +62,7 @@ std_conf = {
 
     # C code global defined symbols
     'CPPDEFINES' : [
+        'NETSTK_CFG_FREQ_BAND, 2',  # NETSTK_FREQ_BAND_OP_434
     ],
 
     # GCC flags
