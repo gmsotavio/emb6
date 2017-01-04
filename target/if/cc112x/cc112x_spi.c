@@ -51,10 +51,13 @@
 ********************************************************************************
 */
 #include "emb6.h"
-
+#include "board_conf.h"
 #include "bsp.h"
 #include "cc112x.h"
 #include "cc112x_spi.h"
+#if (NETSTK_SUPPORT_RF_FRONTEND == TRUE)
+#include "cc112x_frontend.h"
+#endif
 
 
 /*
@@ -286,6 +289,11 @@ void cc112x_spiInit(void)
 {
     cc112x_spiCsIoHandle = bsp_pinInit( EN_HAL_PIN_RFSPICS );
     cc112x_spiHandle = bsp_spiInit( EN_HAL_SPI_RF );
+
+#if (NETSTK_SUPPORT_RF_FRONTEND == TRUE)
+    cc112x_frontend_init();
+    cc112x_frontend_opModeSel(E_RF_FRONTEND_OPMODE_SHUTDOWN);
+#endif
 }
 
 
@@ -301,6 +309,26 @@ rf_status_t cc112x_spiCmdStrobe(uint8_t cmd)
     CC112X_SPI_ON();
     bsp_spiTRx(cc112x_spiHandle, &cmd, &chip_status, 1);
     CC112X_SPI_OFF();
+
+#if (NETSTK_SUPPORT_RF_FRONTEND == TRUE)
+    if (cmd == CC112X_STX) {
+#if (NETSTK_CFG_FRONTEND_BYPASS == TRUE)
+        cc112x_frontend_opModeSel(E_RF_FRONTEND_OPMODE_TX_BYPASS);
+#else
+        cc112x_frontend_opModeSel(E_RF_FRONTEND_OPMODE_TX);
+#endif /* #if (NETSTK_CFG_FRONTEND_BYPASS == TRUE) */
+    }
+    else if ((cmd == CC112X_SWOR) || (cmd == CC112X_SRX)) {
+#if (NETSTK_CFG_FRONTEND_BYPASS == TRUE)
+        cc112x_frontend_opModeSel(E_RF_FRONTEND_OPMODE_RX_BYPASS);
+#else
+        cc112x_frontend_opModeSel(E_RF_FRONTEND_OPMODE_RX);
+#endif /* #if (NETSTK_CFG_FRONTEND_BYPASS == TRUE) */
+    }
+    else if (cmd == CC112X_SPWD) {
+        cc112x_frontend_opModeSel(E_RF_FRONTEND_OPMODE_SHUTDOWN);
+    }
+#endif /* #if (NETSTK_SUPPORT_RF_FRONTEND == TRUE) */
 
     return chip_status;
 }
