@@ -415,8 +415,10 @@ static void rf_waitRdy(void);
 
 static void rf_txPowerSet(int8_t power, e_nsErr_t *p_err);
 static void rf_txPowerGet(int8_t *p_power, e_nsErr_t *p_err);
+#if (MODULATION == MODULATION_SUN_FSK)
 static void rf_chanNumSet(uint8_t chan_num, e_nsErr_t *p_err);
 static void rf_opModeSet(e_nsRfOpMode mode, e_nsErr_t *p_err);
+#endif /* #if (MODULATION == MODULATION_SUN_FSK) */
 static void rf_readRSSI(int8_t *p_val, e_nsErr_t *p_err);
 
 
@@ -771,6 +773,7 @@ static void rf_ioctl(e_nsIocCmd_t cmd, void *p_val, e_nsErr_t *p_err) {
       }
       break;
 
+#if (MODULATION == MODULATION_SUN_FSK)
     case NETSTK_CMD_RF_CHAN_NUM_SET:
       rf_chanNumSet(*((uint8_t *) p_val), p_err);
       break;
@@ -778,6 +781,7 @@ static void rf_ioctl(e_nsIocCmd_t cmd, void *p_val, e_nsErr_t *p_err) {
     case NETSTK_CMD_RF_OP_MODE_SET:
       rf_opModeSet(*((e_nsRfOpMode *) p_val), p_err);
       break;
+#endif
 
     case NETSTK_CMD_RF_WOR_EN:
       if (p_val) {
@@ -2205,9 +2209,11 @@ static void rf_chkReset(struct s_rf_ctx *p_ctx) {
     /* configurations of radio interrupts */
     RF_INT_CONFIG();
 
+#if (MODULATION == MODULATION_SUN_FSK)
     /* re-configure operation frequency */
     rf_opModeSet(p_ctx->cfgOpMode, &err);
     rf_chanNumSet(p_ctx->cfgFreqChanNum, &err);
+#endif
     TRACE_LOG_ERR("radio transceiver was reset, opMode=%d, chanNum=%d", p_ctx->cfgOpMode, p_ctx->cfgFreqChanNum);
   }
 }
@@ -2322,6 +2328,7 @@ static void rf_txPowerGet(int8_t *p_power, e_nsErr_t *p_err) {
 }
 
 
+#if (MODULATION == MODULATION_SUN_FSK)
 /**
  * @brief   Select operating channel number
  * @param   chan_num    Channel number to select
@@ -2482,6 +2489,7 @@ static void rf_opModeSet(e_nsRfOpMode mode, e_nsErr_t *p_err) {
     *p_err = NETSTK_ERR_INVALID_ARGUMENT;
   }
 }
+#endif /* #if (MODULATION == MODULATION_SUN_FSK) */
 
 
 /**
