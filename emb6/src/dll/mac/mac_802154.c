@@ -77,6 +77,9 @@
   #endif
 #endif /* #if (NETSTK_SUPPORT_SW_MAC_AUTOACK == TRUE) */
 
+/* CSMA unit backoff coefficient */
+#define MAC_CSMA_UNIT_BACKOFF_COE               ( 20u )
+
 
 /*
 ********************************************************************************
@@ -696,20 +699,21 @@ static void mac_csma(e_nsErr_t *p_err)
 {
   uint32_t delay = 0;
   uint32_t max_random;
+  uint32_t unit_backoff;
   uint8_t nb;
   uint8_t be;
 
   /* initialize CSMA variables */
   nb = 0;
   be = NETSTK_CFG_CSMA_MIN_BE;
+  unit_backoff = MAC_CSMA_UNIT_BACKOFF_COE * packetbuf_attr(PACKETBUF_ATTR_PHY_SYMBOL_PERIOD);
   *p_err = NETSTK_ERR_NONE;
 
   /* perform CCA maximum MaxBackoff time */
   while (nb <= NETSTK_CFG_CSMA_MAX_BACKOFF) {
     /* delay for random (2^BE - 1) unit backoff periods */
     max_random = (1 << be) - 1;
-    delay  = bsp_getrand(0, max_random);
-    delay *= NETSTK_CFG_CSMA_UNIT_BACKOFF_US;
+    delay = bsp_getrand(0, max_random) * unit_backoff;
     bsp_delayUs(delay);
 
     /* perform CCA */
