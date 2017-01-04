@@ -137,18 +137,59 @@ static void phy_init(void *p_netstk, e_nsErr_t *p_err)
   }
 #endif
 
+  packetbuf_attr_t symbol_period;
+  packetbuf_attr_t symbol_per_octet;
+  packetbuf_attr_t shr_duration;
+  packetbuf_attr_t tx_timeout;
+  s_mac_phy_conf_t *p_cfg;
+
   /* store pointer to netstack structure */
   pphy_netstk = (s_ns_t *) p_netstk;
 
-#if (EMB6_TEST_CFG_WOR_EN == TRUE)
-  /* don't change default settings for WOR test */
-#else
-  /* set operation mode */
-  pphy_netstk->rf->ioctrl(NETSTK_CMD_RF_OP_MODE_SET, &mac_phy_config.op_mode, p_err);
+  /* configure the driver according to configuration settings */
+  p_cfg = &mac_phy_config;
 
-  /* set operation frequency channel number */
-  pphy_netstk->rf->ioctrl(NETSTK_CMD_RF_CHAN_NUM_SET, &mac_phy_config.chan_num, p_err);
+  /* modulation scheme */
+  switch (p_cfg->modulation) {
+    case MODULATION_SUN_FSK:
+      pphy_netstk->rf->ioctrl(NETSTK_CMD_RF_OP_MODE_SET, &p_cfg->op_mode, p_err);
+      pphy_netstk->rf->ioctrl(NETSTK_CMD_RF_CHAN_NUM_SET, &p_cfg->chan_num, p_err);
+
+      /* set symbol period in microseconds */
+      switch (p_cfg->op_mode) {
+        case NETSTK_RF_OP_MODE_CSM:
+#if (NETSTK_CFG_PHY_OP_MODE_1_EN == TRUE)
+        case NETSTK_RF_OP_MODE_1:
 #endif
+          symbol_period = 20; /* data rate: 50kbps */
+          break;
+#if (NETSTK_CFG_PHY_OP_MODE_2_EN == TRUE)
+        case NETSTK_RF_OP_MODE_2:
+          symbol_period = 10; /* data rate: 100kbps */
+          break;
+#endif
+#if (NETSTK_CFG_PHY_OP_MODE_3_EN == TRUE)
+        case NETSTK_RF_OP_MODE_3:
+          symbol_period = 5; /* data rate: 200kbps */
+          break;
+#endif
+        default:
+          /* unsupported setting */
+          *p_err = NETSTK_ERR_INVALID_ARGUMENT;
+          return;
+      }
+      break;
+
+    case MODULATION_GFSK:
+      /* FIXME add support for LUMS targets */
+      symbol_period = 50;
+      break;
+
+    default:
+      /* unsupported setting */
+      *p_err = NETSTK_ERR_INVALID_ARGUMENT;
+      return;
+  }
 
 #if (NETSTK_CFG_WOR_EN == 1)
   uint8_t wor_en = TRUE;
@@ -159,37 +200,23 @@ static void phy_init(void *p_netstk, e_nsErr_t *p_err)
   pphy_netstk->rf->ioctrl(NETSTK_CMD_RF_TXPOWER_SET, &mac_phy_config.init_power, p_err);
 
   /* initialize PHY PIB attributes */
-  packetbuf_attr_t symbol_period;
-  packetbuf_attr_t symbol_per_octet;
-  packetbuf_attr_t shr_duration;
-  packetbuf_attr_t tx_timeout;
+  symbol_per_octet = 8;
+  packetbuf_set_attr(PACKETBUF_ATTR_PHY_SYMBOL_PERIOD, symbol_period);
+  packetbuf_set_attr(PACKETBUF_ATTR_PHY_SYMBOLS_PER_OCTET, symbol_per_octet);
+  packetbuf_set_attr(PACKETBUF_ATTR_PHY_PREAMBLE_SYMBOL_LEN, mac_phy_config.preamble_len * symbol_per_octet);
+  packetbuf_set_attr(PACKETBUF_ATTR_PHY_MAX_PACKET_SIZE, PHY_PSDU_MAX);
+  packetbuf_set_attr(PACKETBUF_ATTR_PHY_TURNAROUND_TIME, (12 * symbol_period));
 
-  if (mac_phy_config.modulation == MODULATION_2FSK50) {
-    /* 2FSK, 50kbps => symbol period = 20us */
-    symbol_period = 20;
-    symbol_per_octet = 8;
+  /* SHR = preamble + 2-byte-SYNC */
+  shr_duration = (mac_phy_config.preamble_len + 2) * symbol_per_octet * symbol_period;
+  packetbuf_set_attr(PACKETBUF_ATTR_PHY_SHR_DURATION, shr_duration);
 
-    packetbuf_set_attr(PACKETBUF_ATTR_PHY_SYMBOL_PERIOD, symbol_period);
-    packetbuf_set_attr(PACKETBUF_ATTR_PHY_SYMBOLS_PER_OCTET, symbol_per_octet);
-    packetbuf_set_attr(PACKETBUF_ATTR_PHY_PREAMBLE_SYMBOL_LEN, mac_phy_config.preamble_len * symbol_per_octet);
-    packetbuf_set_attr(PACKETBUF_ATTR_PHY_MAX_PACKET_SIZE, PHY_PSDU_MAX);
-    packetbuf_set_attr(PACKETBUF_ATTR_PHY_TURNAROUND_TIME, (12 * symbol_period));
+  /* set TX timeout in ticks */
+  tx_timeout = (shr_duration + PHY_PSDU_MAX * symbol_per_octet * symbol_period) / bsp_getTRes();
+  packetbuf_set_attr(PACKETBUF_ATTR_PHY_TXTIMEOUT, tx_timeout);
 
-    /* SHR = preamble + 2-byte-SYNC */
-    shr_duration = (mac_phy_config.preamble_len + 2) * symbol_per_octet * symbol_period;
-    packetbuf_set_attr(PACKETBUF_ATTR_PHY_SHR_DURATION, shr_duration);
-
-    /* set TX timeout in ticks */
-    tx_timeout = (shr_duration + PHY_PSDU_MAX * symbol_per_octet * symbol_period) / bsp_getTRes();
-    packetbuf_set_attr(PACKETBUF_ATTR_PHY_TXTIMEOUT, tx_timeout);
-
-    /* set returned error */
-    *p_err = NETSTK_ERR_NONE;
-  }
-  else {
-    /* currently other modulation schemes are not supported by the driver */
-    *p_err = NETSTK_ERR_FATAL;
-  }
+  /* set returned error */
+  *p_err = NETSTK_ERR_NONE;
 }
 
 /**
