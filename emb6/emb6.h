@@ -115,6 +115,9 @@ typedef uint32_t                            clock_time_t;
 #define MODULATION_BPSK20           1
 #define MODULATION_2FSK50           2
 
+#define MODULATION_GFSK             3
+#define MODULATION_SUN_FSK          4   /* TODO replace _2FSK50 with _SUN_FSK */
+
 
 /*==============================================================================
                         RPL Configuration
