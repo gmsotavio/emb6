@@ -1145,6 +1145,11 @@ void uip_log(char *msg);
 #define NETSTK_CFG_WOR_EN                                   FALSE
 #endif
 
+/*!< Select operation frequency band by default */
+#if !defined(NETSTK_CFG_FREQ_BAND)
+#define NETSTK_CFG_FREQ_BAND                                NETSTK_FREQ_BAND_OP_868
+#endif /* #if !defined(NETSTK_CFG_FREQ_BAND) */
+
 /*!< CSMA configuration */
 #define NETSTK_CFG_CSMA_MIN_BE                    (uint8_t )(   3u )
 #define NETSTK_CFG_CSMA_MAX_BE                    (uint8_t )(   5u )
