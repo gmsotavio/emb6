@@ -5,6 +5,9 @@
  */
 
 #include "bsp.h"
+#include "board_conf.h"
+
+#if (NETSTK_SUPPORT_RF_FRONTEND == TRUE)
 #include "cc112x_frontend.h"
 
 /*============================================================================*/
@@ -82,4 +85,4 @@ uint8_t cc112x_frontend_opModeSel(e_frontendOpMode_t opMode)
   bsp_delayUs(2);
   return 1;
 }
-
+#endif /* #if (NETSTK_SUPPORT_RF_FRONTEND == TRUE) */
