@@ -72,6 +72,15 @@
 #include "crc.h"
 #endif /* #if (NETSTK_SUPPORT_SW_RF_AUTOACK == TRUE) */
 
+/* verify operation frequency band */
+#if (NETSTK_CFG_FREQ_BAND == NETSTK_FREQ_BAND_OP_868)
+#define RF_DEFAULT_CFG_SETTINGS       cc112x_cfg_868mhz
+#elif (NETSTK_CFG_FREQ_BAND == NETSTK_FREQ_BAND_OP_434)
+#define RF_DEFAULT_CFG_SETTINGS       cc112x_cfg_434mhz
+#else
+#error "unsupported frequency bands"
+#endif
+
 #if defined(NETSTK_SUPPORT_HW_CRC)
 #error "missing or wrong radio checksum setting in board_conf.h"
 #endif /* #if defined(NETSTK_SUPPORT_HW_CRC) */
@@ -461,11 +470,7 @@ static void rf_init(void *p_netstk, e_nsErr_t *p_err)
   }
 
   /* configure RF registers */
-#if (EMB6_TEST_CFG_WOR_EN == TRUE)
-  RF_WR_REGS(cc112x_cfg_worSmartRFTesting);
-#else
-  RF_WR_REGS(cc112x_cfg_ieee802154g_default);
-#endif
+  RF_WR_REGS(RF_DEFAULT_CFG_SETTINGS);
 
   /* set FIFO threshold */
   RF_SET_FIFO_THR(RF_CFG_FIFO_THR);
@@ -2188,7 +2193,7 @@ static void rf_chkReset(struct s_rf_ctx *p_ctx) {
     rf_reset();
 
     /* configure RF registers */
-    RF_WR_REGS(cc112x_cfg_ieee802154g_default);
+    RF_WR_REGS(RF_DEFAULT_CFG_SETTINGS);
     RF_SET_FIFO_THR(RF_CFG_FIFO_THR);
 
     /* calibrate radio according to cc112x errata */

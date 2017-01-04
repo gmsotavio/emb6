@@ -172,7 +172,7 @@ static const s_regSettings_t cc112x_cfg_iocfgOff[] = {
  *          Preamble length:    4bytes with WOR-disabled
  *          RX termination:     Carrier Sense with threshold of -90dBm
  */
-static const s_regSettings_t cc112x_cfg_ieee802154g_default[] =
+static const s_regSettings_t cc112x_cfg_868mhz[] =
 {
     {CC112X_IOCFG1,             0xB0},  /* Impedance */
 
@@ -247,6 +247,53 @@ static const s_regSettings_t cc112x_cfg_ieee802154g_default[] =
     {CC112X_XOSC5,              0x0E},
     {CC112X_XOSC2,              0x00},
     {CC112X_XOSC1,              0x03},
+};
+
+/**
+ * @brief   Default register settings for IEEE-802.15.4g
+ *          Carrier Frequency:  434MHz
+ *          Modulation format:  2FSK
+ *          Channel spacing:    100kHz
+ *          Symbol rate:        20kbps
+ *          Bit rate:           20kbps
+ *          RX filter BW:       100kHz
+ *          Modulation format:  2-FSK
+ *          Deviation:          25kHz
+ *          TX power:           15dBm - maximum
+ *          Preamble length:    4bytes with WOR-disabled
+ *          RX termination:     Carrier Sense with threshold of -90dBm
+ */
+static const s_regSettings_t cc112x_cfg_434mhz[] =
+{
+    {CC112X_SYNC_CFG1,          0x08},  /* PQT gating enabled, sync theshold 0x08 */
+    {CC112X_DEVIATION_M,        0x99},  /* Deviation = 25 kHz */
+    {CC112X_MODCFG_DEV_E,       0x0D},  /* Mormal modem mode, 2-GFSK, Deviation = 25 kHz */
+    {CC112X_DCFILT_CFG,         0x15},
+    {CC112X_PREAMBLE_CFG1,      0x18},
+    {CC112X_FREQ_IF_CFG,        0x3A},
+    {CC112X_CHAN_BW,            0x02},  /* Channel filter enabled, BW = 100kHz */
+
+    {CC112X_SYMBOL_RATE2,       0x84},  /* Symbol Rate = 20ksps */
+    {CC112X_SYMBOL_RATE1,       0x7A},  /* Symbol Rate = 20ksps */
+    {CC112X_SYMBOL_RATE0,       0xE1},  /* Symbol Rate = 20ksps */
+
+    /* WOR configuration */
+    {CC112X_WOR_CFG0,           0x24},  /* enable clock division, disable Ev2, disable RCOSC calibration, enable RCOSC */
+    {CC112X_WOR_EVENT0_MSB,     0x01},  /* tEv1 = 9.38ms */
+    {CC112X_WOR_EVENT0_LSB,     0x2C},  /* tEv1 = 9.38ms */
+
+    {CC112X_AGC_REF,            0x3C},
+    {CC112X_AGC_CS_THR,         0x02},  /* AGC Carrier Sense Threshold -102 dBm (+102dB offset!!) */
+    {CC112X_AGC_CFG1,           0xA9},
+    {CC112X_AGC_CFG0,           0xC0},
+    {CC112X_PA_CFG0,            0x79},
+
+    /* Frequency configuration 434MHz */
+    {CC112X_FS_CFG,             0x14},
+    {CC112X_FREQOFF_CFG,        0x20},
+    {CC112X_FREQ2,              0x6C},
+    {CC112X_FREQ1,              0x80},
+    {CC112X_FREQ0,              0x00},
 };
 
 
