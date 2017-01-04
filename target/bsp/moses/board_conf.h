@@ -198,7 +198,7 @@
 
 /** transceiver modulation scheme */
 #if !defined(MODULATION)
-#define MODULATION                          MODULATION_2FSK50
+#define MODULATION                          MODULATION_SUN_FSK
 #endif /* #if !defined(MODULATION) */
 
 /** transceiver supports auto-acknowledgment on software */
