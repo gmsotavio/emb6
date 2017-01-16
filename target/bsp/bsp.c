@@ -161,6 +161,12 @@ static void _bsp_ledCallback(c_event_t c_event, p_data_t p_data);
  */
 static void _bsp_ledCallback( c_event_t event, p_data_t p_data )
 {
+#if defined(HAL_LED_INVERTED)
+  int inv = 1;
+#else
+  int inv = 0;
+#endif
+
   uint8_t j;
   for( j = 0; j < HAL_NUM_LEDS; j++ )
   {
@@ -173,7 +179,8 @@ static void _bsp_ledCallback( c_event_t event, p_data_t p_data )
 
         /* toggle the according pin value */
         if( bsp_leds[j].p_pin != NULL )
-          hal_pinSet( bsp_leds[j].p_pin, !hal_pinGet( bsp_leds[j].p_pin) );
+         // hal_pinSet( bsp_leds[j].p_pin, !hal_pinGet( bsp_leds[j].p_pin) );
+         hal_pinSet( bsp_leds[j].p_pin, inv ? TRUE : FALSE );
         break;
       }
     }
@@ -454,7 +461,8 @@ int8_t bsp_led( uint8_t led, en_bsp_led_op_t op )
         break;
 
       case EN_BSP_LED_OP_BLINK:
-        hal_pinSet( bsp_leds[i].p_pin, !hal_pinGet(bsp_leds[i].p_pin) );
+        hal_pinSet( bsp_leds[i].p_pin, inv ? FALSE : TRUE );
+        //hal_pinSet( bsp_leds[i].p_pin, !hal_pinGet(bsp_leds[i].p_pin) );
         etimer_set(&bsp_leds[i].blinkTmr, 20, _bsp_ledCallback);
         break;
 
@@ -670,3 +678,25 @@ int bsp_getChar(void)
   return 0;
 } /* bsp_getChar() */
 
+
+#if defined(HAL_SUPPORT_RTC)
+/*---------------------------------------------------------------------------*/
+/*
+* bsp_rtcSetTime()
+*/
+int8_t bsp_rtcSetTime( en_hal_rtc_t *p_rtc )
+{
+  EMB6_ASSERT_RET( p_rtc != NULL, -1 );
+  return hal_rtcSetTime(p_rtc);
+}
+
+/*---------------------------------------------------------------------------*/
+/*
+* bsp_rtcGetTime()
+*/
+int8_t bsp_rtcGetTime( en_hal_rtc_t *p_rtc )
+{
+  EMB6_ASSERT_RET( p_rtc != NULL, -1 );
+  return hal_rtcGetTime(p_rtc);
+}
+#endif /* #if defined(HAL_SUPPORT_RTC) */
