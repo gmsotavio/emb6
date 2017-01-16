@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<iarUserArgVars>
+  <group active="true" name="EMB6">
+    <variable>
+      <name>EMB6_ROOT</name>
+      <value>C:\Users\verwalter\Desktop\Lab\workspace\git\hso-esk\emb6-dev</value>
+    </variable>
+  </group>
+</iarUserArgVars>
+
+
