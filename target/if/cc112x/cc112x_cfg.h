@@ -84,73 +84,6 @@
 #define NETSTK_CFG_FREQ_BAND                NETSTK_FREQ_BAND_OP_868
 #endif /* #if !defined(NETSTK_CFG_FREQ_BAND) */
 
-#if (EMB6_TEST_CFG_WOR_EN == TRUE)
-/**
- * @brief WOR test settings are based on setting named "50kbps, 2-GFSK, IEEE 802.15.4G (868)" from TI SmartRF Studio
- *        with CRC disabled (i.e., PKT_CFG1.CRC_CFG = 0)
- *
- *        Setting summary
- *        - Carrier: 868.00 MHz
- *        - Modulation: 2-GFSK
- *        - Preamble: 24 bytes
- *        - Data rate: 50kbps
- *        - WOR: t_sleep = 2.868ms, I = 2.7mA
- *        - SYNC words: 32 bits, 0x930B51DE
- */
-static const s_regSettings_t cc112x_cfg_worSmartRFTesting[] = {
-    {CC112X_IOCFG0,            0x06},
-    {CC112X_IOCFG2,            0x00},
-    {CC112X_IOCFG3,            0x06},
-    {CC112X_IOCFG1,            0xB0}, /* don't care */
-
-    {CC112X_SYNC_CFG1,         0x08},
-    {CC112X_DEVIATION_M,       0x99},
-    {CC112X_MODCFG_DEV_E,      0x0D},
-    {CC112X_DCFILT_CFG,        0x15},
-    {CC112X_PREAMBLE_CFG1,     0x30},
-    {CC112X_FREQ_IF_CFG,       0x3A},
-    {CC112X_IQIC,              0x00},
-    {CC112X_CHAN_BW,           0x02},
-    {CC112X_MDMCFG0,           0x05},
-    {CC112X_SYMBOL_RATE2,      0x99},
-    {CC112X_SYMBOL_RATE1,      0x99},
-    {CC112X_SYMBOL_RATE0,      0x99},
-    {CC112X_AGC_REF,           0x40}, /* DO NOT change */
-    {CC112X_AGC_CS_THR,        0x0C},
-    {CC112X_AGC_CFG1,          0xA0},
-    {CC112X_AGC_CFG0,          0xC0},
-    {CC112X_FIFO_CFG,          0x00},
-    {CC112X_SETTLING_CFG,      0x03},
-    {CC112X_FS_CFG,            0x12},
-    {CC112X_WOR_CFG0,          0x20},
-    {CC112X_WOR_EVENT0_LSB,    0x78},
-    {CC112X_PKT_CFG0,          0x20},
-    {CC112X_PKT_CFG1,          0x01},
-    {CC112X_RFEND_CFG0,        0x00},
-    {CC112X_PA_CFG0,           0x79},
-    {CC112X_PKT_LEN,           0xFF},
-    {CC112X_IF_MIX_CFG,        0x00},
-    {CC112X_TOC_CFG,           0x0A},
-    {CC112X_FREQ2,             0x6C},
-    {CC112X_FREQ1,             0x80},
-    {CC112X_FREQ0,             0x00},
-    {CC112X_FS_DIG1,           0x00},
-    {CC112X_FS_DIG0,           0x5F},
-    {CC112X_FS_CAL1,           0x40},
-    {CC112X_FS_CAL0,           0x0E},
-    {CC112X_FS_DIVTWO,         0x03},
-    {CC112X_FS_DSM0,           0x33},
-    {CC112X_FS_DVC0,           0x17},
-    {CC112X_FS_PFD,            0x50},
-    {CC112X_FS_PRE,            0x6E},
-    {CC112X_FS_REG_DIV_CML,    0x14},
-    {CC112X_FS_SPARE,          0xAC},
-    {CC112X_FS_VCO0,           0xB4},
-    {CC112X_XOSC5,             0x0E},
-    {CC112X_XOSC2,             0x00},
-    {CC112X_XOSC1,             0x03},
-};
-#endif /* EMB6_TEST_CFG_WOR_EN */
 
 static const s_regSettings_t cc112x_cfg_iocfgOn[] = {
     {CC112X_IOCFG0,             0x06},  /* PKT_BEGIN, unchanged at runtime */
@@ -190,7 +123,7 @@ static const s_regSettings_t cc112x_cfg_868mhz[] =
     {CC112X_SYNC2,              0x4E},  /* SFD[ 7-0] ... */
     {CC112X_SYNC1,              0x51},  /* don't care */
     {CC112X_SYNC0,              0xDE},  /* don't care */
-    {CC112X_SYNC_CFG1,          0x48},  /* AUTO_CLEAR = 1, enabled; RX_CONFIG_LIMITATION = 0 */
+    {CC112X_SYNC_CFG1,          0x08},  /* AUTO_CLEAR = 1, enabled; RX_CONFIG_LIMITATION = 0 */
     {CC112X_SYNC_CFG0,          0x1B},  /* 16H bits SYCN3-SYNC2 */
 
     {CC112X_DEVIATION_M,        0x99},  /* Deviation 25kHz */
@@ -209,7 +142,7 @@ static const s_regSettings_t cc112x_cfg_868mhz[] =
     {CC112X_SYMBOL_RATE0,       0x99},
 
     {CC112X_AGC_REF,            0x3C},
-    {CC112X_AGC_CS_THR,         0x0C},  /* default 0C -90dBm; 0x2A = -60dBm; 0x16 = -0x80dBm */
+    {CC112X_AGC_CS_THR,         0x2A},  /* default 0C -90dBm; 0x2A = -60dBm; 0x16 = -0x80dBm */
     {CC112X_AGC_CFG1,           0xA9},
     {CC112X_AGC_CFG0,           0xC0},  /* RSSI_VALID_CNT = 00b; 0x02 */
     {CC112X_FIFO_CFG,           0x00},  /* Automatically flushes when CRC error occurred */
@@ -222,6 +155,7 @@ static const s_regSettings_t cc112x_cfg_868mhz[] =
     {CC112X_WOR_EVENT0_MSB,     0x00},  /* eWOR timeout = 3.102ms */
     {CC112X_WOR_EVENT0_LSB,     0x78},  /* eWOR timeout = 3.102ms */
 
+    {CC112X_PKT_CFG2,           0x0C},  /* Indicates clear channel when RSSI is below threshold and currently not receiving a packet */
 #if (NETSTK_CFG_DATA_WHITENING_EN == TRUE)
     {CC112X_PKT_CFG1,           0x41},  /* CRC_CFG = 00; CRC16 is disabled, APPEND_STATUS is disabled */
 #else
@@ -275,96 +209,60 @@ static const s_regSettings_t cc112x_cfg_868mhz[] =
  */
 static const s_regSettings_t cc112x_cfg_434mhz[] =
 {
-    {CC112X_SYNC_CFG1,          0x08},  /* PQT gating enabled, sync theshold 0x08 */
-    {CC112X_DEVIATION_M,        0x99},  /* Deviation = 25 kHz */
-    {CC112X_MODCFG_DEV_E,       0x0D},  /* Mormal modem mode, 2-GFSK, Deviation = 25 kHz */
+    {CC112X_IOCFG1,             0xB0},  /* Impedance */
+
+    {CC112X_SYNC3,              0x90},  /* SFD[15-8] FEC not supported and phyMRFSKSFD = 0 -> SFD = 0x904E */
+    {CC112X_SYNC2,              0x4E},  /* SFD[ 7-0] ... */
+    {CC112X_SYNC1,              0x51},  /* don't care */
+    {CC112X_SYNC0,              0xDE},  /* don't care */
+    {CC112X_SYNC_CFG1,          0x08},  /* AUTO_CLEAR = 1, enabled; RX_CONFIG_LIMITATION = 0 */
+    {CC112X_SYNC_CFG0,          0x1B},  /* 16H bits SYCN3-SYNC2 */
+
+    {CC112X_DEVIATION_M,        0x99},  /* Deviation 25kHz */
+    {CC112X_MODCFG_DEV_E,       0x0D},  /* 2-GFSK */
     {CC112X_DCFILT_CFG,         0x15},
-    {CC112X_PREAMBLE_CFG1,      0x18},
+
+    {CC112X_PREAMBLE_CFG1,      0x19},  /* NUM_PREAMBLE = 4 bytes;  PREAMBLE_WORD = 0x55 */
+
     {CC112X_FREQ_IF_CFG,        0x3A},
-    {CC112X_CHAN_BW,            0x02},  /* Channel filter enabled, BW = 100kHz */
+    {CC112X_IQIC,               0x00},
+    {CC112X_CHAN_BW,            0x02},
+    {CC112X_MDMCFG0,            0x05},
 
-    {CC112X_SYMBOL_RATE2,       0x84},  /* Symbol Rate = 20ksps */
-    {CC112X_SYMBOL_RATE1,       0x7A},  /* Symbol Rate = 20ksps */
-    {CC112X_SYMBOL_RATE0,       0xE1},  /* Symbol Rate = 20ksps */
+    {CC112X_SYMBOL_RATE2,       0x84},  /* Symbol rate: 20kbps */
+    {CC112X_SYMBOL_RATE1,       0x7A},
+    {CC112X_SYMBOL_RATE0,       0xE1},
 
-    /* WOR configuration */
-    {CC112X_WOR_CFG0,           0x24},  /* enable clock division, disable Ev2, disable RCOSC calibration, enable RCOSC */
-    {CC112X_WOR_EVENT0_MSB,     0x01},  /* tEv1 = 9.38ms */
+    {CC112X_AGC_REF,            0x3C},
+    {CC112X_AGC_CS_THR,         0x2A},  /* default 0C -90dBm; 0x2A = -60dBm; 0x16 = -0x80dBm */
+    {CC112X_AGC_CFG1,           0xA9},
+    {CC112X_AGC_CFG0,           0xC0},  /* RSSI_VALID_CNT = 00b; 0x02 */
+    {CC112X_FIFO_CFG,           0x00},  /* Automatically flushes when CRC error occurred */
+
+    {CC112X_SETTLING_CFG,       0x03},
+    {CC112X_FS_CFG,             0x12},
+
+    {CC112X_WOR_CFG1,           0x08},  /* eWOR mode = Normal Mode */
+    {CC112X_WOR_CFG0,           0x20},  /* RCOSC is running; RCOSC calibration disabled; Clock division enabled */
+    {CC112X_WOR_EVENT0_MSB,     0x01},  /* tEv1 = 9.38ms @20kbps */
     {CC112X_WOR_EVENT0_LSB,     0x2C},  /* tEv1 = 9.38ms */
 
-    {CC112X_AGC_REF,            0x3C},
-    {CC112X_AGC_CS_THR,         0x02},  /* AGC Carrier Sense Threshold -102 dBm (+102dB offset!!) */
-    {CC112X_AGC_CFG1,           0xA9},
-    {CC112X_AGC_CFG0,           0xC0},
+    {CC112X_PKT_CFG2,           0x0C},  /* Indicates clear channel when RSSI is below threshold and currently not receiving a packet */
+    {CC112X_PKT_CFG1,           0x01},  /* CRC16 is disabled, APPEND_STATUS is enabled */
+    {CC112X_PKT_CFG0,           0x20},
+    {CC112X_RFEND_CFG0,         0x00},  /* Terminate on bad packet is disabled; */
     {CC112X_PA_CFG0,            0x79},
+    {CC112X_PKT_LEN,            0xFF},
 
-    /* Frequency configuration 434MHz */
-    {CC112X_FS_CFG,             0x14},
-    {CC112X_FREQOFF_CFG,        0x20},
-    {CC112X_FREQ2,              0x6C},
+    {CC112X_FREQ2,              0x6C},  /* 434MHz */
     {CC112X_FREQ1,              0x80},
     {CC112X_FREQ0,              0x00},
-};
-
-
-/**
- * @brief   RF registers with following configurations
- *          Carrier Frequency:  434MHz
- *          Symbol rate:        50kbps
- *          Bit rate:           50kpbs
- *          RX filter BW:       100kHz
- *          Modulation format:  2-FGSK
- *          Deviation:          25kHz
- *          TX power:           14dBm
- *
- *          RX Sniff mode:      enabled (eWOR)
- *          Preamble length:    24bytes
- *          RX termination:     Carrier Sense with threshold of -90dBm
- */
-static const s_regSettings_t cc112x_cfg_ch_434mhz50bps[] =
-{
-    {CC112X_IOCFG3,             0x0F},  /* CCA_STATUS */
-    {CC112X_IOCFG2,             0x13},
-    {CC112X_IOCFG1,             0xB0},
-    {CC112X_IOCFG0,             0x06},
-
-    {CC112X_SYNC3,              0x93},
-    {CC112X_SYNC2,              0x0B},
-    {CC112X_SYNC1,              0x51},
-    {CC112X_SYNC0,              0xDE},
-    {CC112X_SYNC_CFG1,          0x08},  /* PQT gating enabled, sync threshold 0x08 */
-    {CC112X_SYNC_CFG0,          0x1B},  /* 1B: 16H bit, 17: 32bit Sync */
-
-    {CC112X_DEVIATION_M,        0x99},  /* Deviation = 24.963379 kHz */
-    {CC112X_MODCFG_DEV_E,       0x0D},  /* Normal modem mode, 2-GFSK, Deviation = 20.019531 kHz */
-    {CC112X_DCFILT_CFG,         0x15},
-    {CC112X_PREAMBLE_CFG1,      0x30},  /* 24byte long preamble */
-    {CC112X_FREQ_IF_CFG,        0x3A},
-    {CC112X_CHAN_BW,            0x02},  /* Channel filter enabled, BW = 100kHz */
-
-    {CC112X_SYMBOL_RATE2,       0x99},  /* Symbol Rate = 50ksps */
-    {CC112X_SYMBOL_RATE1,       0x99},  /* Symbol Rate = 50ksps */
-    {CC112X_SYMBOL_RATE0,       0x99},  /* Symbol Rate = 50ksps */
-
-    /* WOR configuration */
-    {CC112X_WOR_CFG0,           0x24},  /* enable clock division, disable Ev2, disable RCOSC calibration, enable RCOSC */
-    {CC112X_WOR_EVENT0_MSB,     0x00},  /* tEv1 = 3.76ms */
-    {CC112X_WOR_EVENT0_LSB,     0x78},  /* tEv1 = 3.76ms */
-
-    {CC112X_AGC_REF,            0x3C},
-    {CC112X_AGC_CS_THR,         0x00},  /* AGC Carrier Sense Threshold -102 dBm (+102dB offset!!) */
-    {CC112X_AGC_CFG1,           0xA9},
-    {CC112X_AGC_CFG0,           0xC0},
-
-    {CC112X_PA_CFG0,            0x79},
-
-    /* Frequency configuration 434MHz */
     {CC112X_FS_CFG,             0x14},
     {CC112X_FREQOFF_CFG,        0x20},
-    {CC112X_FREQ2,              0x6C},
-    {CC112X_FREQ1,              0x80},
-    {CC112X_FREQ0,              0x00},
 
+    /*
+     * Miscellaneous, needed
+     */
     {CC112X_FS_DIG1,            0x00},
     {CC112X_FS_DIG0,            0x5F},
     {CC112X_FS_CAL1,            0x40},
@@ -381,5 +279,4 @@ static const s_regSettings_t cc112x_cfg_ch_434mhz50bps[] =
     {CC112X_XOSC2,              0x00},
     {CC112X_XOSC1,              0x03},
 };
-
-#endif
+#endif /* #ifndef CC112X_CFG_PRESENT */
