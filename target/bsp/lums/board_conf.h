@@ -173,28 +173,79 @@
 /** Mask of RF control 5 pin */
 #define MSP430_IO_MASK_RF_CTRL5             (1 << MSP430_IO_PIN_RF_CTRL5)
 
-
 /* add platform-specific SLIPUART configuration */
 #if defined(HAL_SUPPORT_SLIPUART)
-/** USART used for SLIP interface */
 #define MSP430_SLIP_UART                    E_UART_SEL_UART1
-/** Baudrate of SLIP UART */
 #define MSP430_SLIP_UART_BAUD               115200
+#define MSP430_SLIP_UART_TX_PORT            E_IO_PORT_P5
+#define MSP430_SLIP_UART_TX_PIN             6
+#define MSP430_SLIP_UART_TX_MSK             (1 << MSP430_SLIP_UART_TX_PIN)
+#define MSP430_SLIP_UART_RX_PORT            E_IO_PORT_P5
+#define MSP430_SLIP_UART_RX_PIN             7
+#define MSP430_SLIP_UART_RX_MSK             (1 << MSP430_SLIP_UART_RX_PIN)
 #endif /* #if defined(HAL_SUPPORT_SLIPUART) */
 
+/*
+ * UART0 for command line interface
+ */
+#if !defined(HAL_SUPPORT_USERUART0)
+#define HAL_SUPPORT_USERUART0               TRUE
+#define HAL_SUPPORT_PERIPHIRQ_USERUART0_RX  TRUE
+
+#define MSP430_USERUART0                    E_UART_SEL_UART1
+#define MSP430_USERUART0_BAUD               115200
+#define MSP430_USERUART0_TX_PORT            E_IO_PORT_P5
+#define MSP430_USERUART0_TX_PIN             6
+#define MSP430_USERUART0_TX_MSK             (1 << MSP430_USERUART0_TX_PIN)
+#define MSP430_USERUART0_RX_PORT            E_IO_PORT_P5
+#define MSP430_USERUART0_RX_PIN             7
+#define MSP430_USERUART0_RX_MSK             (1 << MSP430_USERUART0_RX_PIN)
+#endif /* #if !defined(HAL_SUPPORT_USERUART0) */
+
+/*
+ * UART1 for reading value of sensor 1
+ */
+#if !defined(HAL_SUPPORT_USERUART1)
+#define HAL_SUPPORT_USERUART1               TRUE
+#define HAL_SUPPORT_PERIPHIRQ_USERUART1_RX  TRUE
+
+#define MSP430_USERUART1                    E_UART_SEL_UART0
+#define MSP430_USERUART1_BAUD               9600
+#define MSP430_USERUART1_TX_PORT            E_IO_PORT_P3
+#define MSP430_USERUART1_TX_PIN             4
+#define MSP430_USERUART1_TX_MSK             (1 << MSP430_USERUART1_TX_PIN)
+#define MSP430_USERUART1_RX_PORT            E_IO_PORT_P3
+#define MSP430_USERUART1_RX_PIN             5
+#define MSP430_USERUART1_RX_MSK             (1 << MSP430_USERUART1_RX_PIN)
+#endif /* #if !defined(HAL_SUPPORT_USERUART1) */
+
+/*
+ * UART2 for reading value of sensor 2
+ */
+#if !defined(HAL_SUPPORT_USERUART2)
+#define HAL_SUPPORT_USERUART2               TRUE
+#define HAL_SUPPORT_PERIPHIRQ_USERUART2_RX  TRUE
+
+#define MSP430_USERUART2                    E_UART_SEL_UART3
+#define MSP430_USERUART2_BAUD               9600
+#define MSP430_USERUART2_TX_PORT            E_IO_PORT_P10
+#define MSP430_USERUART2_TX_PIN             4
+#define MSP430_USERUART2_TX_MSK             (1 << MSP430_USERUART2_TX_PIN)
+#define MSP430_USERUART2_RX_PORT            E_IO_PORT_P10
+#define MSP430_USERUART2_RX_PIN             5
+#define MSP430_USERUART2_RX_MSK             (1 << MSP430_USERUART2_RX_PIN)
+#endif /* #if !defined(HAL_SUPPORT_USERUART0) */
+
+
 /* add platform-specific debug configuration */
-/** UART used for DEBUG interface */
-#define MSP430_DEBUG_UART                     E_UART_SEL_UART1
-/** Baudrate of DEBUG UART */
-#define MSP430_DEBUG_UART_BAUD                115200
-
-#define MSP430_DEBUG_UART_RX_PORT             E_IO_PORT_P5
-#define MSP430_DEBUG_UART_RX_PIN              7
-#define MSP430_DEBUG_UART_RX_MSK              (1 << MSP430_DEBUG_UART_RX_PIN)
-
-#define MSP430_DEBUG_UART_TX_PORT             E_IO_PORT_P5
-#define MSP430_DEBUG_UART_TX_PIN              6
-#define MSP430_DEBUG_UART_TX_MSK              (1 << MSP430_DEBUG_UART_TX_PIN)
+#define MSP430_DEBUG_UART                   E_UART_SEL_UART1
+#define MSP430_DEBUG_UART_BAUD              115200
+#define MSP430_DEBUG_UART_TX_PORT           E_IO_PORT_P5
+#define MSP430_DEBUG_UART_TX_PIN            6
+#define MSP430_DEBUG_UART_TX_MSK            (1 << MSP430_DEBUG_UART_TX_PIN)
+#define MSP430_DEBUG_UART_RX_PORT           E_IO_PORT_P5
+#define MSP430_DEBUG_UART_RX_PIN            7
+#define MSP430_DEBUG_UART_RX_MSK            (1 << MSP430_DEBUG_UART_RX_PIN)
 
 
 /* add platform-specific LEDs configuration */
@@ -248,6 +299,17 @@
 #define MSP430_IO_PIN_LED3                  3
 /** LED3 pin mask */
 #define MSP430_IO_MASK_LED3                 (1 << MSP430_IO_PIN_LED3)
+
+
+/** Enable info-flash support */
+#ifndef HAL_SUPPORT_INFOFLASH
+#define HAL_SUPPORT_INFOFLASH               TRUE
+#endif
+
+/** Enable real-time clock (RTC) support */
+#ifndef HAL_SUPPORT_RTC
+#define HAL_SUPPORT_RTC                     TRUE
+#endif
 
 
 /*

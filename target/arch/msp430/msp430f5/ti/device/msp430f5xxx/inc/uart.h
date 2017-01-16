@@ -84,7 +84,7 @@ typedef struct S_UART_DESC_T
 } s_uart_desc_t;
 
 /** Definition for RX callback functions */
-typedef void (*pf_uart_rxCb)( uint8_t c );
+typedef void (*pf_uart_rxCb)( e_uart_sel_t chan, uint8_t c );
 
 /*============================================================================*/
 /*                          FUNCTION PROTOTYPES                               */

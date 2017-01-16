@@ -91,7 +91,7 @@ static void _uart_irqHandler0( void* p_params )
   {
     /* RX interrupt ... invoke callback if registered */
     if( gpf_uartCB[e_uart] != NULL )
-        gpf_uartCB[e_uart]( *gps_uart[e_uart].RXBUF );
+        gpf_uartCB[e_uart]( e_uart, *gps_uart[e_uart].RXBUF );
   }
 }
 #endif /* #if (TARGET_CONFIG_UART0 == TRUE) */
@@ -114,7 +114,7 @@ static void _uart_irqHandler1( void* p_params )
   {
     /* RX interrupt ... invoke callback if registered */
     if( gpf_uartCB[e_uart] != NULL )
-        gpf_uartCB[e_uart]( *gps_uart[e_uart].RXBUF );
+        gpf_uartCB[e_uart]( e_uart, *gps_uart[e_uart].RXBUF );
   }
 }
 #endif /* #if (TARGET_CONFIG_UART1 == TRUE) */
@@ -137,7 +137,7 @@ static void _uart_irqHandler3( void* p_params )
   {
     /* RX interrupt ... invoke callback if registered */
     if( gpf_uartCB[e_uart] != NULL )
-        gpf_uartCB[e_uart]( *gps_uart[e_uart].RXBUF );
+        gpf_uartCB[e_uart]( e_uart, *gps_uart[e_uart].RXBUF );
   }
 }
 #endif /* #if (TARGET_CONFIG_UART0 == TRUE) */

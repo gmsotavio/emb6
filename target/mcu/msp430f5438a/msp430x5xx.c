@@ -145,13 +145,14 @@ typedef struct
  */
 typedef struct
 {
-  /* TODO missing MCU-specific attributes */
-
   /** tx pin */
   s_hal_gpio_pin_t* p_txPin;
   /** rx  pin */
   s_hal_gpio_pin_t* p_rxPin;
-
+  /** ID */
+  e_uart_sel_t id;
+  /** baudrate */
+  uint32_t baudrate;
 } s_hal_uart_t;
 
 
@@ -221,9 +222,28 @@ static s_hal_gpio_pin_t s_hal_gpio[EN_HAL_PIN_MAX] = {
   {&gps_io_port[MSP430_IO_PORT_RF_CTRL5], MSP430_IO_PIN_RF_CTRL5, MSP430_IO_MASK_RF_CTRL5, MSP430_IO_PIN_DIR_OUTPUT, NULL},
 #endif /* #if defined(HAL_SUPPORT_RFCTRL5) */
 
+  /*
+   * UART pins
+   */
 #if defined(HAL_SUPPORT_SLIPUART)
-  {NULL, NULL, NULL, MSP430_IO_PIN_DIR_INPUT, NULL},
+  {&gps_io_port[MSP430_SLIP_UART_TX_PORT], MSP430_SLIP_UART_TX_PIN, MSP430_SLIP_UART_TX_MSK, MSP430_IO_PIN_DIR_OUTPUT, NULL},
+  {&gps_io_port[MSP430_SLIP_UART_RX_PORT], MSP430_SLIP_UART_RX_PIN, MSP430_SLIP_UART_RX_MSK, MSP430_IO_PIN_DIR_INPUT, NULL},
 #endif /* #if defined(HAL_SUPPORT_SLIPUART) */
+
+#if defined(HAL_SUPPORT_USERUART0)
+  {&gps_io_port[MSP430_USERUART0_TX_PORT], MSP430_USERUART0_TX_PIN, MSP430_USERUART0_TX_MSK, MSP430_IO_PIN_DIR_OUTPUT, NULL},
+  {&gps_io_port[MSP430_USERUART0_RX_PORT], MSP430_USERUART0_RX_PIN, MSP430_USERUART0_RX_MSK, MSP430_IO_PIN_DIR_INPUT, NULL},
+#endif /* #if defined(HAL_SUPPORT_USERUART0) */
+
+#if defined(HAL_SUPPORT_USERUART1)
+  {&gps_io_port[MSP430_USERUART1_TX_PORT], MSP430_USERUART1_TX_PIN, MSP430_USERUART1_TX_MSK, MSP430_IO_PIN_DIR_OUTPUT, NULL},
+  {&gps_io_port[MSP430_USERUART1_RX_PORT], MSP430_USERUART1_RX_PIN, MSP430_USERUART1_RX_MSK, MSP430_IO_PIN_DIR_INPUT, NULL},
+#endif /* #if defined(HAL_SUPPORT_USERUART1) */
+
+#if defined(HAL_SUPPORT_USERUART2)
+  {&gps_io_port[MSP430_USERUART2_TX_PORT], MSP430_USERUART2_TX_PIN, MSP430_USERUART2_TX_MSK, MSP430_IO_PIN_DIR_OUTPUT, NULL},
+  {&gps_io_port[MSP430_USERUART2_RX_PORT], MSP430_USERUART2_RX_PIN, MSP430_USERUART2_RX_MSK, MSP430_IO_PIN_DIR_INPUT, NULL},
+#endif /* #if defined(HAL_SUPPORT_USERUART2) */
 
 };
 
@@ -241,15 +261,27 @@ static s_hal_spi_t s_hal_spi = {
 #endif /* #if defined(HAL_SUPPORT_RFSPI) */
 
 
-#if defined(HAL_SUPPORT_SLIPUART)
+#if (HAL_SUPPORT_UART == TRUE)
 /** Definition of the SPI interface */
-static s_hal_uart_t s_hal_uart = {
-  /* TODO add missing definition */
+static s_hal_uart_t s_hal_uart[] = {
 
-  .p_txPin  = &s_hal_gpio[EN_HAL_PIN_SLIPUARTTX],
-  .p_rxPin  = &s_hal_gpio[EN_HAL_PIN_SLIPUARTRX],
+#if defined(HAL_SUPPORT_SLIPUART)
+  {&s_hal_gpio[EN_HAL_PIN_SLIPUARTTX], &s_hal_gpio[EN_HAL_PIN_SLIPUARTRX], MSP430_SLIP_UART, MSP430_SLIP_UART_BAUD},
+#endif /* #if defined(HAL_SUPPORT_SLIPUART) */
+
+#if defined(HAL_SUPPORT_USERUART0)
+  {&s_hal_gpio[EN_HAL_PIN_USERUART0_TX], &s_hal_gpio[EN_HAL_PIN_USERUART0_RX], MSP430_USERUART0, MSP430_USERUART0_BAUD},
+#endif /* #if defined(HAL_SUPPORT_USERUART0) */
+
+#if defined(HAL_SUPPORT_USERUART1)
+  {&s_hal_gpio[EN_HAL_PIN_USERUART1_TX], &s_hal_gpio[EN_HAL_PIN_USERUART1_RX], MSP430_USERUART1, MSP430_USERUART1_BAUD},
+#endif /* #if defined(HAL_SUPPORT_USERUART1) */
+
+#if defined(HAL_SUPPORT_USERUART2)
+  {&s_hal_gpio[EN_HAL_PIN_USERUART2_TX], &s_hal_gpio[EN_HAL_PIN_USERUART2_RX], MSP430_USERUART2, MSP430_USERUART2_BAUD},
+#endif /* #if defined(HAL_SUPPORT_USERUART2) */
 };
-#endif /* #if defined(HAL_SUPPORT_RFSPI) */
+#endif /* #if (HAL_SUPPORT_UART == TRUE) */
 
 
 /** Definition of the peripheral callback functions */
@@ -264,8 +296,9 @@ static void _hal_tcInit( void );
 static void _hal_tcCb( void *arg );
 
 #if (HAL_SUPPORT_UART == TRUE)
-static void _hal_uartRxCb( uint8_t c );
+static void _hal_uartRxCb( e_uart_sel_t chan, uint8_t c );
 #endif
+
 
 /*
  *  --- Local Functions ---------------------------------------------------- *
@@ -310,19 +343,23 @@ static void _hal_tcCb( void *arg )
 } /* _hal_tcCb() */
 
 #if defined(HAL_SUPPORT_UART)
-#if defined(HAL_SUPPORT_PERIPHIRQ_SLIPUART_RX)
 /*---------------------------------------------------------------------------*/
 /*
 * _hal_uartRxCb()
 */
-static void _hal_uartRxCb( uint8_t c )
+static void _hal_uartRxCb( e_uart_sel_t chan, uint8_t c )
 {
-  if( s_hal_irqs[EN_HAL_PERIPHIRQ_SLIPUART_RX].pf_cb != NULL )
-  {
-    s_hal_irqs[EN_HAL_PERIPHIRQ_SLIPUART_RX].pf_cb( &c );
+  uint8_t i = 0;
+
+  for (i = 0; i < EN_HAL_PERIPHIRQ_MAX; i++) {
+    if (s_hal_uart[i].id == chan) {
+      if (s_hal_irqs[i].pf_cb != NULL) {
+        s_hal_irqs[i].pf_cb( &c );
+        break;
+      }
+    }
   }
 } /* _hal_uartRxCb() */
-#endif /* #if defined(HAL_SUPPORT_PERIPHIRQ_SLIPUART_RX) */
 #endif /* #if defined(HAL_SUPPORT_UART) */
 
 
@@ -362,6 +399,11 @@ int8_t hal_init( void )
 
   /* initialize timer counter */
   _hal_tcInit();
+
+#if (HAL_SUPPORT_UART == TRUE)
+  /* initialize UART */
+  uart_init();
+#endif /* #if (HAL_SUPPORT_UART == TRUE) */
 
 #if (HAL_SUPPORT_RTC == TRUE)
   /* initialize real-time clock management */
@@ -674,9 +716,21 @@ int32_t hal_spiTx( void* p_spi, uint8_t* p_tx, uint16_t len )
 */
 void* hal_uartInit( en_hal_uart_t uart )
 {
-  uart_init();
-  uart_config(MSP430_SLIP_UART, MSP430_SLIP_UART_BAUD, _hal_uartRxCb);
-  return &s_hal_uart;
+  EMB6_ASSERT_RET( uart < EN_HAL_UART_MAX, NULL );
+
+  s_hal_uart_t *p_uart = &s_hal_uart[uart];
+
+  /* Set Tx Pin as alternate function and output*/
+  *p_uart->p_txPin->PORT->PSEL |= p_uart->p_txPin->MSK;
+  *p_uart->p_txPin->PORT->PDIR |= p_uart->p_txPin->MSK;
+
+  /* Set Rx Pin as alternate function and input*/
+  *p_uart->p_rxPin->PORT->PSEL |= p_uart->p_rxPin->MSK;
+  *p_uart->p_rxPin->PORT->PDIR &= ~p_uart->p_rxPin->MSK;
+
+  /* configure UART */
+  uart_config(p_uart->id, p_uart->baudrate, _hal_uartRxCb);
+  return p_uart;
 } /* hal_uartInit() */
 
 /*---------------------------------------------------------------------------*/
@@ -685,7 +739,7 @@ void* hal_uartInit( en_hal_uart_t uart )
 */
 int32_t hal_uartRx( void* p_uart, uint8_t * p_rx, uint16_t len )
 {
-  EMB6_ASSERT_RET( p_uart == &s_hal_uart, -1 );
+  EMB6_ASSERT_RET( p_uart != NULL, -1 );
 
   /* not supported */
   return -1;
@@ -697,9 +751,11 @@ int32_t hal_uartRx( void* p_uart, uint8_t * p_rx, uint16_t len )
 */
 int32_t hal_uartTx( void* p_uart, uint8_t* p_tx, uint16_t len )
 {
-  EMB6_ASSERT_RET( p_uart == &s_hal_uart, -1 );
+  EMB6_ASSERT_RET( p_uart != NULL, -1 );
 
-  return uart_send(MSP430_SLIP_UART, p_tx, len);
+  s_hal_uart_t *p_uartDrv = (s_hal_uart_t *)p_uart;
+
+  return uart_send(p_uartDrv->id, (char *)p_tx, len);
 } /* hal_uartTx() */
 #endif /* #if defined(HAL_SUPPORT_UART) */
 
@@ -745,8 +801,7 @@ int8_t hal_debugInit( void )
   *s_pin_tx.PORT->PSEL |= s_pin_tx.MSK;
   *s_pin_tx.PORT->PDIR |= s_pin_tx.MSK;
 
-  /* initialize UART */
-  uart_init();
+  /* configure UART */
   uart_config(MSP430_DEBUG_UART, MSP430_DEBUG_UART_BAUD, NULL);
 #endif /* #if (LOGGER_LEVEL > 0) && (HAL_SUPPORT_SLIPUART == FALSE) */
   return 0;

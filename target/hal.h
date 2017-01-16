@@ -83,9 +83,9 @@
 
 
 /* Enable UART access a soon as one of the UART interfaces is supported. */
-#if defined(HAL_SUPPORT_SLIPUART) || defined(HAL_SUPPORT_USERUART)
+#if defined(HAL_SUPPORT_SLIPUART) || defined(HAL_SUPPORT_USERUART0) || defined(HAL_SUPPORT_USERUART1) || defined(HAL_SUPPORT_USERUART2)
 #define HAL_SUPPORT_UART            TRUE
-#endif /* #if defined(HAL_SUPPORT_UART) */
+#endif /* #if defined(HAL_SUPPORT_SLIPUART) || defined(HAL_SUPPORT_USERUART0) || defined(HAL_SUPPORT_USERUART1) || defined(HAL_SUPPORT_USERUART2) */
 
 
 /** Maximum number of LEDs */
@@ -191,12 +191,26 @@ typedef enum EN_HAL_PIN_T
     EN_HAL_PIN_SLIPUARTRX,
 #endif /* #if defined(HAL_SUPPORT_SLIPUART) */
 
-#if defined(HAL_SUPPORT_USERUART)
-    /** SLIP UART TX */
-    EN_HAL_PIN_USERUARTTX,
-    /** SLIP UART RX */
-    EN_HAL_PIN_USERUARTRX,
-#endif /* #if defined(HAL_SUPPORT_SLIPUART) */
+#if defined(HAL_SUPPORT_USERUART0)
+    /** USER UART 0 TX */
+    EN_HAL_PIN_USERUART0_TX,
+    /** USER UART 0 RX */
+    EN_HAL_PIN_USERUART0_RX,
+#endif /* #if defined(HAL_SUPPORT_USERUART0) */
+
+#if defined(HAL_SUPPORT_USERUART1)
+    /** USER UART 1 TX */
+    EN_HAL_PIN_USERUART1_TX,
+    /** USER UART 1 RX */
+    EN_HAL_PIN_USERUART1_RX,
+#endif /* #if defined(HAL_SUPPORT_USERUART1) */
+
+#if defined(HAL_SUPPORT_USERUART2)
+    /** USER UART 2 TX */
+    EN_HAL_PIN_USERUART2_TX,
+    /** USER UART 2 RX */
+    EN_HAL_PIN_USERUART2_RX,
+#endif /* #if defined(HAL_SUPPORT_USERUART2) */
 
     EN_HAL_PIN_MAX
 
@@ -230,19 +244,25 @@ typedef enum EN_HAL_IRQEDGE_T
  */
 typedef enum EN_HAL_PERIPHIRQ_T
 {
-#if defined(HAL_SUPPORT_SLIPUART)
-#if defined(HAL_SUPPORT_PERIPHIRQ_SLIPUART_RX)
+#if defined(HAL_SUPPORT_SLIPUART) && defined(HAL_SUPPORT_PERIPHIRQ_SLIPUART_RX)
     /** SLIP UART RX IRQ */
     EN_HAL_PERIPHIRQ_SLIPUART_RX,
-#endif /* #if defined(HAL_SUPPORT_PERIPHIRQ_SLIPUART_RX) */
-#endif /* #if defined(HAL_SUPPORT_SLIPUART) */
+#endif /* #if defined(HAL_SUPPORT_SLIPUART) && defined(HAL_SUPPORT_PERIPHIRQ_SLIPUART_RX) */
 
-#if defined(HAL_SUPPORT_USERUART)
-#if defined(HAL_SUPPORT_PERIPHIRQ_USERUART_RX)
-    /** SLIP UART RX IRQ */
-    EN_HAL_PERIPHIRQ_USERUART_RX,
-#endif /* #if defined(HAL_SUPPORT_PERIPHIRQ_USERUART_RX) */
-#endif /* #if defined(HAL_SUPPORT_UARTUSER) */
+#if defined(HAL_SUPPORT_USERUART0) && defined(HAL_SUPPORT_PERIPHIRQ_USERUART0_RX)
+    /** USER UART 0 RX IRQ */
+    EN_HAL_PERIPHIRQ_USERUART0_RX,
+#endif /* #if defined(HAL_SUPPORT_USERUART0) && defined(HAL_SUPPORT_PERIPHIRQ_USERUART0_RX) */
+
+#if defined(HAL_SUPPORT_USERUART1) && defined(HAL_SUPPORT_PERIPHIRQ_USERUART1_RX)
+    /** USER UART 1 RX IRQ */
+    EN_HAL_PERIPHIRQ_USERUART1_RX,
+#endif /* #if defined(HAL_SUPPORT_USERUART0) && defined(HAL_SUPPORT_PERIPHIRQ_USERUART1_RX) */
+
+#if defined(HAL_SUPPORT_USERUART2) && defined(HAL_SUPPORT_PERIPHIRQ_USERUART2_RX)
+    /** USER UART 2 RX IRQ */
+    EN_HAL_PERIPHIRQ_USERUART2_RX,
+#endif /* #if defined(HAL_SUPPORT_USERUART0) && defined(HAL_SUPPORT_PERIPHIRQ_USERUART2_RX) */
 
     EN_HAL_PERIPHIRQ_MAX
 
@@ -276,14 +296,24 @@ typedef enum EN_HAL_SPI_T
 typedef enum EN_HAL_UART_T
 {
 #if defined(HAL_SUPPORT_SLIPUART)
-    /** RF SPI */
+    /** SLIP UART */
     EN_HAL_UART_SLIP,
 #endif /* #if defined(HAL_SUPPORT_SLIPUART) */
 
-#if defined(HAL_SUPPORT_USERUART)
-    /** RF SPI */
-    EN_HAL_UART_USER,
-#endif /* #if defined(HAL_SUPPORT_USERUART) */
+#if defined(HAL_SUPPORT_USERUART0)
+    /** USER UART 0 */
+    EN_HAL_UART_USER_0,
+#endif /* #if defined(HAL_SUPPORT_USERUART0) */
+
+#if defined(HAL_SUPPORT_USERUART1)
+    /** USER UART 1 */
+    EN_HAL_UART_USER_1,
+#endif /* #if defined(HAL_SUPPORT_USERUART1) */
+
+#if defined(HAL_SUPPORT_USERUART2)
+    /** USER UART 2 */
+    EN_HAL_UART_USER_2,
+#endif /* #if defined(HAL_SUPPORT_USERUART2) */
 
     EN_HAL_UART_MAX
 
