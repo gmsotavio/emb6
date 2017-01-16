@@ -93,11 +93,6 @@ typedef uint32_t                            clock_time_t;
                         NETSTACK CONFIGURATION OPTIONS
  =============================================================================*/
 
-/** Netstack frequency band options */
-#define NETSTK_FREQ_BAND_OP_NULL            ( 0u )    /* only for native platform */
-#define NETSTK_FREQ_BAND_OP_868             ( 1u )
-#define NETSTK_FREQ_BAND_OP_434             ( 2u )
-
 
 /*=============================================================================
                                 CONFIGURATIONS

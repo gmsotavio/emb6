@@ -74,6 +74,16 @@
 #define CC112X_CFG_RETX_EN                  FALSE   /* this feature is currently unstable, then should not be enabled */
 #endif
 
+/** Netstack frequency band options */
+#define NETSTK_FREQ_BAND_OP_NULL            ( 0u )
+#define NETSTK_FREQ_BAND_OP_868             ( 1u )
+#define NETSTK_FREQ_BAND_OP_434             ( 2u )
+
+/*!< Select operation frequency band by default */
+#if !defined(NETSTK_CFG_FREQ_BAND)
+#define NETSTK_CFG_FREQ_BAND                NETSTK_FREQ_BAND_OP_868
+#endif /* #if !defined(NETSTK_CFG_FREQ_BAND) */
+
 #if (EMB6_TEST_CFG_WOR_EN == TRUE)
 /**
  * @brief WOR test settings are based on setting named "50kbps, 2-GFSK, IEEE 802.15.4G (868)" from TI SmartRF Studio
