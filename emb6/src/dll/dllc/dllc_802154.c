@@ -240,6 +240,10 @@ static void dllc_send(uint8_t *p_data, uint16_t len, e_nsErr_t *p_err)
   if (is_broadcast == 1) {
     params.fcf.ack_required = 0;
   } else {
+    /* FIXME set packet attributes properly */
+    packetbuf_set_attr(PACKETBUF_ATTR_RELIABLE, 1);
+    packetbuf_set_attr(PACKETBUF_ATTR_MAX_MAC_TRANSMISSIONS, 4);
+
     params.fcf.ack_required = packetbuf_attr(PACKETBUF_ATTR_RELIABLE);
   }
 
