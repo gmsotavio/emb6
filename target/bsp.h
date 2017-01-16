@@ -599,5 +599,60 @@ int8_t bsp_rtcSetTime( en_hal_rtc_t *p_rtc );
 int8_t bsp_rtcGetTime( en_hal_rtc_t *p_rtc );
 #endif /* #if defined(HAL_SUPPORT_RTC) */
 
+
+#if defined(HAL_SUPPORT_INFOFLASH)
+/**
+ * bsp_infoFlashInit()
+ *
+ * \brief   Initialize info-flash interface.
+ *
+ *          The stack uses several UARTs. Therefore the HAl has to provide the
+ *          according functions to access the UART interfaces. This function
+ *          initializes the UART e.g. by configuring the according PINs,
+ *          the core and the BAUD rate.
+ *
+ * \param   uart  UART type to initialize.
+ *
+ * \return  A pointer to the UART instance on success or NULL in case of an error.
+ */
+void* bsp_infoFlashInit( en_hal_infoFlashSeg_t seg );
+
+
+/**
+ * bsp_infoFlashRead()
+ *
+ * \brief   Read data from UART.
+ *
+ *          The stack uses several UARTs. Therefore the HAl has to provide the
+ *          according functions to access the UART interfaces. This function
+ *          receives data from the UART interface.
+ *
+ * \param   p_uart  The UART interface to read.
+ * \param   p_rx    Receive buffer.
+ * \param   len     Length of the buffer.
+ *
+ * \return  The number of bytes received on success or negative value on error.
+ */
+int32_t bsp_infoFlashRead( void* p_seg, uint8_t * p_rx, uint16_t len );
+
+
+/**
+ * bsp_infoFlashWrite()
+ *
+ * \brief   Transmit data via UART.
+ *
+ *          The stack uses several UARTs. Therefore the HAl has to provide the
+ *          according functions to access the UART interfaces. This function
+ *          transmits data via the UART interface.
+ *
+ * \param   p_uart  The UART interface to write.
+ * \param   p_tx    Transmit buffer.
+ * \param   len     Length of the buffer.
+ *
+ * \return  The number of bytes transmitted on success or negative value on error.
+ */
+int32_t bsp_infoFlashWrite( void* p_seg, uint8_t* p_tx, uint16_t len );
+#endif /* #if defined(HAL_SUPPORT_INFOFLASH) */
+
 #endif /* __BSP_H__ */
 

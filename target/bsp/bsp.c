@@ -700,3 +700,35 @@ int8_t bsp_rtcGetTime( en_hal_rtc_t *p_rtc )
   return hal_rtcGetTime(p_rtc);
 }
 #endif /* #if defined(HAL_SUPPORT_RTC) */
+
+
+#if defined(HAL_SUPPORT_INFOFLASH)
+/*---------------------------------------------------------------------------*/
+/*
+* bsp_infoFlashInit()
+*/
+void* bsp_infoFlashInit( en_hal_infoFlashSeg_t seg )
+{
+  return hal_infoFlashInit(seg);
+} /* bsp_infoFlashInit() */
+
+
+/*---------------------------------------------------------------------------*/
+/*
+* bsp_infoFlashRead()
+*/
+int32_t bsp_infoFlashRead( void* p_seg, uint8_t * p_rx, uint16_t len )
+{
+  return hal_infoFlashRead( p_seg, p_rx, len );
+} /* bsp_infoFlashRead() */
+
+
+/*---------------------------------------------------------------------------*/
+/*
+* bsp_infoFlashWrite()
+*/
+int32_t bsp_infoFlashWrite( void* p_seg, uint8_t* p_tx, uint16_t len )
+{
+  return hal_infoFlashWrite( p_seg, p_tx, len );
+} /* bsp_infoFlashWrite() */
+#endif /* #if defined(HAL_SUPPORT_INFOFLASH) */

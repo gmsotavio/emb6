@@ -319,6 +319,30 @@ typedef enum EN_HAL_UART_T
 
 } en_hal_uart_t;
 
+
+/**
+ * \brief   Describes the different types of info flash segments.
+ *
+ *          Depending on its purpose emb::6 can have several info flash
+ *          segments. This enumeration shows which interfaces must be
+ *          available to emb::6.
+ */
+typedef enum EN_HAL_INFOFLASHSEG_T
+{
+  /** Segment A */
+  EN_HAL_INFOFLASH_SEG_A,
+  /** Segment B */
+  EN_HAL_INFOFLASH_SEG_B,
+  /** Segment C */
+  EN_HAL_INFOFLASH_SEG_C,
+  /** Segment D */
+  EN_HAL_INFOFLASH_SEG_D,
+
+  EN_HAL_INFOFLASH_SEG_MAX,
+
+} en_hal_infoFlashSeg_t;
+
+
 /**
  * \brief   Describes real-time clock.
  *
@@ -826,5 +850,60 @@ int8_t hal_rtcSetTime( en_hal_rtc_t *p_rtc );
  */
 int8_t hal_rtcGetTime( en_hal_rtc_t *p_rtc );
 #endif /* #if defined(HAL_SUPPORT_RTC) */
+
+
+#if defined(HAL_SUPPORT_INFOFLASH)
+/**
+ * hal_infoFlashInit()
+ *
+ * \brief   Initialize info-flash interface.
+ *
+ *          The stack uses several UARTs. Therefore the HAl has to provide the
+ *          according functions to access the UART interfaces. This function
+ *          initializes the UART e.g. by configuring the according PINs,
+ *          the core and the BAUD rate.
+ *
+ * \param   uart  UART type to initialize.
+ *
+ * \return  A pointer to the UART instance on success or NULL in case of an error.
+ */
+void* hal_infoFlashInit( en_hal_infoFlashSeg_t seg );
+
+
+/**
+ * hal_infoFlashRead()
+ *
+ * \brief   Read data from UART.
+ *
+ *          The stack uses several UARTs. Therefore the HAl has to provide the
+ *          according functions to access the UART interfaces. This function
+ *          receives data from the UART interface.
+ *
+ * \param   p_uart  The UART interface to read.
+ * \param   p_rx    Receive buffer.
+ * \param   len     Length of the buffer.
+ *
+ * \return  The number of bytes received on success or negative value on error.
+ */
+int32_t hal_infoFlashRead( void* p_seg, uint8_t * p_rx, uint16_t len );
+
+
+/**
+ * hal_infoFlashWrite()
+ *
+ * \brief   Transmit data via UART.
+ *
+ *          The stack uses several UARTs. Therefore the HAl has to provide the
+ *          according functions to access the UART interfaces. This function
+ *          transmits data via the UART interface.
+ *
+ * \param   p_uart  The UART interface to write.
+ * \param   p_tx    Transmit buffer.
+ * \param   len     Length of the buffer.
+ *
+ * \return  The number of bytes transmitted on success or negative value on error.
+ */
+int32_t hal_infoFlashWrite( void* p_seg, uint8_t* p_tx, uint16_t len );
+#endif /* #if defined(HAL_SUPPORT_INFOFLASH) */
 
 #endif /* __HAL_H__ */

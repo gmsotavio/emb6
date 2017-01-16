@@ -67,9 +67,14 @@
 #include "uart.h"
 #include "rt_tmr.h"
 
+#if defined(HAL_SUPPORT_INFOFLASH)
+#include "infoflash.h"
+#endif
+
 #if defined(HAL_SUPPORT_RTC)
 #include "rtc.h"
 #endif
+
 
 /*
  *  --- Macros ------------------------------------------------------------- *
@@ -289,6 +294,10 @@ static s_hal_uart_t s_hal_uart[] = {
 static s_hal_irq s_hal_irqs[EN_HAL_PERIPHIRQ_MAX];
 #endif
 
+#if defined(HAL_SUPPORT_INFOFLASH)
+static uint8_t hal_infoFlashSegs[EN_HAL_INFOFLASH_SEG_MAX];
+#endif
+
 /*
  *  --- Local Function Prototypes ------------------------------------------ *
  */
@@ -404,6 +413,11 @@ int8_t hal_init( void )
   /* initialize UART */
   uart_init();
 #endif /* #if (HAL_SUPPORT_UART == TRUE) */
+
+#if (HAL_SUPPORT_INFOFLASH == TRUE)
+  /* initialize info flash management */
+  infoflash_init();
+#endif /* #if (HAL_SUPPORT_INFOFLASH == TRUE) */
 
 #if (HAL_SUPPORT_RTC == TRUE)
   /* initialize real-time clock management */
@@ -831,3 +845,39 @@ int8_t hal_rtcGetTime( en_hal_rtc_t *p_rtc )
     return 0;
 }
 #endif /* #if defined(HAL_SUPPORT_RTC) */
+
+
+#if defined(HAL_SUPPORT_INFOFLASH)
+/*---------------------------------------------------------------------------*/
+/*
+* hal_infoFlashInit()
+*/
+void* hal_infoFlashInit( en_hal_infoFlashSeg_t seg )
+{
+  return &hal_infoFlashSegs[seg];
+} /* hal_infoFlashInit() */
+
+
+/*---------------------------------------------------------------------------*/
+/*
+* hal_infoFlashRead()
+*/
+int32_t hal_infoFlashRead( void* p_seg, uint8_t * p_rx, uint16_t len )
+{
+  EMB6_ASSERT_RET( p_seg != NULL, -1 );
+  infoflash_read( *(e_infoflash_seg_t *)p_seg, p_rx, len);
+  return -1;
+} /* hal_infoFlashRead() */
+
+
+/*---------------------------------------------------------------------------*/
+/*
+* hal_infoFlashWrite()
+*/
+int32_t hal_infoFlashWrite( void* p_seg, uint8_t* p_tx, uint16_t len )
+{
+  EMB6_ASSERT_RET( p_seg != NULL, -1 );
+  infoflash_write( *(e_infoflash_seg_t *)p_seg, p_tx, len);
+  return -1;
+} /* hal_infoFlashWrite() */
+#endif /* #if defined(HAL_SUPPORT_INFOFLASH) */
