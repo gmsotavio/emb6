@@ -142,6 +142,10 @@
 #endif
 #endif
 
+#if DEMO_USE_LUMS
+#include "demo_lums.h"
+#endif
+
 #if UIP_CONF_IPV6_RPL
 #include "rpl.h"
 #endif
@@ -339,6 +343,10 @@ static void loc_demoAppsConf(s_ns_t* pst_netStack, e_nsErr_t *p_err)
     demo_dtlsConf(pst_netStack);
     #endif
 
+#if DEMO_USE_LUMS
+    demo_lumsConf(pst_netStack);
+#endif
+
     /* set returned error code */
     *p_err = NETSTK_ERR_NONE;
 }
@@ -422,6 +430,12 @@ if (!demo_lwm2mInit()) {
 	    return 0;
     }
     #endif
+
+#if DEMO_USE_LUMS
+    if (!demo_lumsInit()) {
+        return 0;
+    }
+#endif
 
     return 1;
 }
